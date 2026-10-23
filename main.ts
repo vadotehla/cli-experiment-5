@@ -39,10 +39,17 @@ while (i < argv.length) {
         const FlagName: string = CurrentElement.slice(
           2,
           DefinesValueInline
-            ? CurrentElement.indexOf("=") - 1
+            ? CurrentElement.indexOf("=")
             : CurrentElement.length
         );
         Nodes.push({ NodeType: Types.AST.NodeType.FLAG, Value: FlagName });
+        if (DefinesValueInline) {
+          const Value: string = CurrentElement.slice(
+            CurrentElement.indexOf("=") + 1
+          );
+
+          Nodes.push({ NodeType: Types.AST.NodeType.VALUE, Value });
+        }
         Finished = true;
       } else if (
         CurrentElement.startsWith("-") &&
@@ -52,7 +59,7 @@ while (i < argv.length) {
         const FlagName: string = CurrentElement.slice(
           1,
           DefinesValueInline
-            ? CurrentElement.indexOf("=") - 1
+            ? CurrentElement.indexOf("=")
             : CurrentElement.length
         );
         console.log(FlagName);
@@ -69,12 +76,30 @@ while (i < argv.length) {
               });
             }
           }
+          if (DefinesValueInline) {
+            const Value: string = CurrentElement.slice(
+              CurrentElement.indexOf("=") + 1
+            );
+
+            Nodes.push({ NodeType: Types.AST.NodeType.VALUE, Value });
+          }
         } else {
           PlausibleValues = DefinesValueInline ? 0 : 1;
           Nodes.push({ NodeType: Types.AST.NodeType.FLAG, Value: FlagName });
         }
+        Finished = true;
       }
     }
+  }
+
+  if (PlausibleValues > 0 && !Finished) {
+    PlausibleValues--;
+    Nodes.push({ NodeType: Types.AST.NodeType.VALUE, Value: CurrentElement });
+  } else if (!Finished) {
+    Nodes.push({
+      NodeType: Types.AST.NodeType.POSITIONAL,
+      Value: CurrentElement,
+    });
   }
 
   i++;
