@@ -26,7 +26,6 @@ while (i < argv.length) {
   const CurrentElement: string = argv[i];
 
   if (CurrentElement.startsWith("-") && ContinueFlags) {
-    if (PlausibleValues > 0) PlausibleValues = 0;
     if (CurrentElement === "--") {
       ContinueFlags = false;
       Finished = true;
@@ -35,22 +34,39 @@ while (i < argv.length) {
     if (ContinueFlags && !Finished) {
       if (CurrentElement.startsWith("--")) {
         const DefinesValueInline: boolean = CurrentElement.includes("=");
-        PlausibleValues = DefinesValueInline ? 0 : 1;
         const FlagName: string = CurrentElement.slice(
           2,
           DefinesValueInline
             ? CurrentElement.indexOf("=")
             : CurrentElement.length
         );
-        Nodes.push({ NodeType: Types.AST.NodeType.FLAG, Value: FlagName });
-        if (DefinesValueInline) {
-          const Value: string = CurrentElement.slice(
-            CurrentElement.indexOf("=") + 1
-          );
-
-          Nodes.push({ NodeType: Types.AST.NodeType.VALUE, Value });
+        if (!isNaN(Number(FlagName[0]))) {
+          if (PlausibleValues > 0) {
+            Nodes.push({
+              NodeType: Types.AST.NodeType.VALUE,
+              Value: CurrentElement,
+            });
+            PlausibleValues--;
+          } else {
+            Nodes.push({
+              NodeType: Types.AST.NodeType.POSITIONAL,
+              Value: CurrentElement,
+            });
+          }
+          Finished = true;
         }
-        Finished = true;
+        if (!Finished) {
+          PlausibleValues = DefinesValueInline ? 0 : 1;
+          Nodes.push({ NodeType: Types.AST.NodeType.FLAG, Value: FlagName });
+          if (DefinesValueInline) {
+            const Value: string = CurrentElement.slice(
+              CurrentElement.indexOf("=") + 1
+            );
+
+            Nodes.push({ NodeType: Types.AST.NodeType.VALUE, Value });
+          }
+          Finished = true;
+        }
       } else if (
         CurrentElement.startsWith("-") &&
         !CurrentElement.startsWith("--")
@@ -62,7 +78,22 @@ while (i < argv.length) {
             ? CurrentElement.indexOf("=")
             : CurrentElement.length
         );
-        if (FlagName.length > 1) {
+        if (!isNaN(Number(FlagName[0]))) {
+          if (PlausibleValues > 0) {
+            Nodes.push({
+              NodeType: Types.AST.NodeType.VALUE,
+              Value: CurrentElement,
+            });
+            PlausibleValues--;
+          } else {
+            Nodes.push({
+              NodeType: Types.AST.NodeType.POSITIONAL,
+              Value: CurrentElement,
+            });
+          }
+          Finished = true;
+        }
+        if (FlagName.length > 1 && !Finished) {
           PlausibleValues = DefinesValueInline
             ? FlagName.length - 1
             : FlagName.length;
@@ -82,7 +113,7 @@ while (i < argv.length) {
 
             Nodes.push({ NodeType: Types.AST.NodeType.VALUE, Value });
           }
-        } else {
+        } else if (!Finished) {
           PlausibleValues = DefinesValueInline ? 0 : 1;
           Nodes.push({ NodeType: Types.AST.NodeType.FLAG, Value: FlagName });
           if (DefinesValueInline) {
@@ -95,6 +126,7 @@ while (i < argv.length) {
         }
         Finished = true;
       }
+      if (PlausibleValues > 0) PlausibleValues = 0;
     }
   }
 
