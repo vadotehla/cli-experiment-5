@@ -1,0 +1,6 @@
+{
+  "nodeModulesDir": "auto",
+  "tasks": {
+    "compile": "deno compile --allow-all main.ts -o dk"
+  }
+}
