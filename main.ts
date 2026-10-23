@@ -62,7 +62,6 @@ while (i < argv.length) {
             ? CurrentElement.indexOf("=")
             : CurrentElement.length
         );
-        console.log(FlagName);
         if (FlagName.length > 1) {
           PlausibleValues = DefinesValueInline
             ? FlagName.length - 1
@@ -86,6 +85,13 @@ while (i < argv.length) {
         } else {
           PlausibleValues = DefinesValueInline ? 0 : 1;
           Nodes.push({ NodeType: Types.AST.NodeType.FLAG, Value: FlagName });
+          if (DefinesValueInline) {
+            const Value: string = CurrentElement.slice(
+              CurrentElement.indexOf("=") + 1
+            );
+
+            Nodes.push({ NodeType: Types.AST.NodeType.VALUE, Value });
+          }
         }
         Finished = true;
       }
