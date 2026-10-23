@@ -17,6 +17,16 @@ if (argv.length < 1) {
 
 const Nodes: Types.AST.ASTNode[] = [];
 
+function ContainsNumber(str: string): boolean {
+  for (let i = 0; i < str.length; i++) {
+    const Glyph: string | undefined = str.at(i);
+    if (Glyph) {
+      if (!isNaN(Number(Glyph))) return true;
+    }
+  }
+  return false;
+}
+
 let i: number = 0;
 let PlausibleValues: number = 0;
 let ContinueFlags: boolean = true;
@@ -31,15 +41,13 @@ while (i < argv.length) {
       Finished = true;
     }
     if (
-      !isNaN(
-        Number(
-          CurrentElement.slice(
-            0,
-            CurrentElement.includes("=")
-              ? CurrentElement.indexOf("=")
-              : CurrentElement.length
-          ).replaceAll(/\-/g, "")
-        )
+      ContainsNumber(
+        CurrentElement.slice(
+          0,
+          CurrentElement.includes("=")
+            ? CurrentElement.indexOf("=")
+            : CurrentElement.length
+        ).replaceAll(/\-/g, "")
       )
     ) {
       if (PlausibleValues > 0) {
@@ -56,7 +64,7 @@ while (i < argv.length) {
       }
       Finished = true;
     }
-    if (PlausibleValues > 0) PlausibleValues = 0;
+    if (!Finished && PlausibleValues > 0) PlausibleValues = 0;
 
     if (ContinueFlags && !Finished) {
       if (CurrentElement.startsWith("--")) {
