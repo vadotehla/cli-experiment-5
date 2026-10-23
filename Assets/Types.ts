@@ -1,5 +1,10 @@
 /** @format */
+// deno-lint-ignore-file no-explicit-any
 
+export interface Flag {
+  readonly FlagName: string;
+  readonly FlagValue: any;
+}
 export interface Command {
   readonly CommandName: string;
   readonly CommandDescription: string[] | undefined;
@@ -11,7 +16,7 @@ export interface Command {
     | ((
         Subcommands: string[],
         Arguments: string[],
-        Flags: string[]
+        Flags: Flag[]
       ) => Promise<void>)
-    | ((Subcommands: string[], Arguments: string[], Flags: string[]) => void);
+    | ((Subcommands: string[], Arguments: string[], Flags: Flag[]) => void);
 }
