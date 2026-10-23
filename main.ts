@@ -30,6 +30,33 @@ while (i < argv.length) {
       ContinueFlags = false;
       Finished = true;
     }
+    if (
+      !isNaN(
+        Number(
+          CurrentElement.slice(
+            0,
+            CurrentElement.includes("=")
+              ? CurrentElement.indexOf("=")
+              : CurrentElement.length
+          ).replaceAll(/\-/g, "")
+        )
+      )
+    ) {
+      if (PlausibleValues > 0) {
+        Nodes.push({
+          NodeType: Types.AST.NodeType.VALUE,
+          Value: CurrentElement,
+        });
+        PlausibleValues--;
+      } else {
+        Nodes.push({
+          NodeType: Types.AST.NodeType.POSITIONAL,
+          Value: CurrentElement,
+        });
+      }
+      Finished = true;
+    }
+    if (PlausibleValues > 0) PlausibleValues = 0;
 
     if (ContinueFlags && !Finished) {
       if (CurrentElement.startsWith("--")) {
@@ -40,21 +67,6 @@ while (i < argv.length) {
             ? CurrentElement.indexOf("=")
             : CurrentElement.length
         );
-        if (!isNaN(Number(FlagName[0]))) {
-          if (PlausibleValues > 0) {
-            Nodes.push({
-              NodeType: Types.AST.NodeType.VALUE,
-              Value: CurrentElement,
-            });
-            PlausibleValues--;
-          } else {
-            Nodes.push({
-              NodeType: Types.AST.NodeType.POSITIONAL,
-              Value: CurrentElement,
-            });
-          }
-          Finished = true;
-        }
         if (!Finished) {
           PlausibleValues = DefinesValueInline ? 0 : 1;
           Nodes.push({ NodeType: Types.AST.NodeType.FLAG, Value: FlagName });
@@ -78,21 +90,6 @@ while (i < argv.length) {
             ? CurrentElement.indexOf("=")
             : CurrentElement.length
         );
-        if (!isNaN(Number(FlagName[0]))) {
-          if (PlausibleValues > 0) {
-            Nodes.push({
-              NodeType: Types.AST.NodeType.VALUE,
-              Value: CurrentElement,
-            });
-            PlausibleValues--;
-          } else {
-            Nodes.push({
-              NodeType: Types.AST.NodeType.POSITIONAL,
-              Value: CurrentElement,
-            });
-          }
-          Finished = true;
-        }
         if (FlagName.length > 1 && !Finished) {
           PlausibleValues = DefinesValueInline
             ? FlagName.length - 1
@@ -126,7 +123,6 @@ while (i < argv.length) {
         }
         Finished = true;
       }
-      if (PlausibleValues > 0) PlausibleValues = 0;
     }
   }
 
