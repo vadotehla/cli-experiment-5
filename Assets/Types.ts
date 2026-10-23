@@ -29,3 +29,15 @@ export interface Command {
       ) => Promise<void>)
     | ((Subcommands: string[], Arguments: string[], Flags: Flag[]) => void);
 }
+
+export namespace AST {
+  export enum NodeType {
+    FLAG,
+    POSITIONAL,
+    VALUE,
+  }
+  export interface ASTNode {
+    readonly NodeType: NodeType;
+    readonly Value: string;
+  }
+}
