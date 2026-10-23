@@ -26,6 +26,11 @@ function ContainsNumber(str: string): boolean {
   }
   return false;
 }
+function IsMalformedFlag(str: string): boolean {
+  return /[\d\s\[\]\(\)\{\}\'\"\`\~\!\@\#\$\%\^\&\*\.\,\/\\\;\:\|\_\+]/g.test(
+    str
+  );
+}
 
 let i: number = 0;
 let PlausibleValues: number = 0;
@@ -41,7 +46,7 @@ while (i < argv.length) {
       Finished = true;
     }
     if (
-      ContainsNumber(
+      IsMalformedFlag(
         CurrentElement.slice(
           0,
           CurrentElement.includes("=")
