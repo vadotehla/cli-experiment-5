@@ -17,15 +17,6 @@ if (argv.length < 1) {
 
 const Nodes: Types.AST.ASTNode[] = [];
 
-function ContainsNumber(str: string): boolean {
-  for (let i = 0; i < str.length; i++) {
-    const Glyph: string | undefined = str.at(i);
-    if (Glyph) {
-      if (!isNaN(Number(Glyph))) return true;
-    }
-  }
-  return false;
-}
 function IsMalformedFlag(str: string): boolean {
   return /[\d\s\[\]\(\)\{\}\'\"\`\~\!\@\#\$\%\^\&\*\.\,\/\\\;\:\|\_\+]/g.test(
     str
